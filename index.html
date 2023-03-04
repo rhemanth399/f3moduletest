@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Book Search</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<h1 style="text-align: center;">Book Store App</h1>
+	<form id="search-form">
+		<label for="search-input"><h3>Search for a book By their Name:</h3></label>
+		<input type="text" id="search-input" name="search-input">
+		<input type="submit" value="Search">
+	</form>
+
+	<h2 id="bookresultheading">Book Result:</h2>
+	<div id="book-results"></div>
+    <a href="history.html">
+    <button type="submit" id="viewsearchbtn" style="font-size: 15px;">View Search History</button>
+    </a>
+	<script>
+		// Get the search input element and results container element
+		const searchInput = document.getElementById('search-input');
+		const bookResults = document.getElementById('book-results');
+
+		// Add event listener to search form
+		document.getElementById('search-form').addEventListener('submit', (event) => {
+			event.preventDefault(); // Prevent default form submission
+
+			// Get search query from input field
+			const searchQuery = searchInput.value.trim();
+
+			// Save search query to local storage
+			let searchHistory = JSON.parse(localStorage.getItem('bookSearchHistory')) || [];
+			searchHistory.push(searchQuery);
+			localStorage.setItem('bookSearchHistory', JSON.stringify(searchHistory));
+
+			// Clear previous search results
+			bookResults.innerHTML = '';
+
+			// Make API request to Google Books API
+			fetch(`https://www.googleapis.com/books/v1/volumes?q=${searchQuery}`)
+				.then(response => response.json())
+				.then(data => {
+                    console.log(data)
+					// Loop through each book in the results and create a book element
+					data.items.forEach(book => {
+						const bookElement = document.createElement('div');
+						bookElement.classList.add('book');
+
+						// Get book title and author name
+						const title = book.volumeInfo.title;
+						const author = book.volumeInfo.authors ? book.volumeInfo.authors.join(', ') : 'Unknown author'
+                        // Get book cover image
+					const cover = book.volumeInfo.imageLinks ? book.volumeInfo.imageLinks.thumbnail : 'https://via.placeholder.com/150x200?text=No+Cover+Image';
+
+// Get book description
+const description = book.volumeInfo.description ? book.volumeInfo.description.substring(0, 200) + '...' : 'No description available.';
+
+// Create book element
+bookElement.innerHTML = `
+    <img src="${cover}" alt="${title} cover">
+    <h2>${title}</h2>
+    <p>By ${author}</p>
+    <p>${description}</p>
+`;
+
+// Append book element to results container
+bookResults.appendChild(bookElement);
+});
+})
+.catch(error => console.error(error));
+});
+
+// Load search history from local storage and display it
+// let searchHistory = JSON.parse(localStorage.getItem('bookSearchHistory')) || [];
+// if (searchHistory.length > 0) {
+// const historyList = document.createElement('ul');
+// searchHistory.forEach(searchQuery => {
+// const listItem = document.createElement('li');
+// listItem.textContent = searchQuery;
+// historyList.appendChild(listItem);
+// });
+// document.body.insertBefore(historyList, bookResults);
+// }
+</script>
+</body>
+</html>
+

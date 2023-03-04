@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search History</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Search History</h1>
+    <table id="history-list" style="margin:20px;"></table>
+    <div class="main" style="display:flex; margin:50px;justify-content:space-between">
+    <button id="clear-history-btn" style="background-color: black; color:white; font-size: 20px; border-radius: 5px;">Clear History</button>
+    <a href="index.html">
+    <button style="background-color: black; color:white;font-size: 20px;border-radius: 5px;">Back to Book Search</button>
+    </a>
+    </div>
+    <!-- <script src="historyscript.js"></script> -->
+
+    <script>
+            const clearHistoryBtn = document.getElementById('clear-history-btn');
+
+        // Add event listener to clear history button
+            clearHistoryBtn.addEventListener('click', () => {
+                localStorage.removeItem('bookSearchHistory');
+                historyList.innerHTML = '<p>Search history cleared.</p>';
+            });
+
+        // Get the search history from local storage
+        
+        const searchHistory = JSON.parse(localStorage.getItem('bookSearchHistory')) || [];
+
+        // Get the history list element
+        const historyList = document.getElementById('history-list');
+
+        // Loop through each search query in the search history
+        searchHistory.forEach(searchQuery => {
+            // Create a list item element for each search query
+            const listItem = document.createElement('tr');
+            listItem.textContent = searchQuery;
+            listItem.style.backgroundColor='black';
+            listItem.style.color='white';
+            listItem.style.textAlign='center'
+            listItem.style.fontSize='30px';
+            listItem.style.height='45px';
+            listItem.style.marginBottom='20px';
+
+            // Add a click event listener to the list item
+            listItem.addEventListener('click', () => {
+                // Store the search query in session storage
+                sessionStorage.setItem('searchQuery', searchQuery);
+
+                // Redirect to the book results page
+                window.location.href = 'result.html';
+            });
+
+            // Add the list item to the history list
+            historyList.appendChild(listItem);
+        });
+    </script>
+</body>
+</html>

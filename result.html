@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Book Search Results</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Book Search Results</h1>
+    <a href="history.html">
+        <button id="backtohistory" style="background-color: black; color:white;">PreviousPage</button>
+    </a>
+    <div id="book-results"></div>
+
+    <script>
+        // Get the search query from session storage
+        const searchQuery = sessionStorage.getItem('searchQuery');
+
+        // Get the book results container element
+        const bookResults = document.getElementById('book-results');
+
+        // Make API request to Google Books API
+        fetch(`https://www.googleapis.com/books/v1/volumes?q=${searchQuery}`)
+            .then(response => response.json())
+            .then(data => {
+                // Loop through each book in the results and create a book element
+                data.items.forEach(book => {
+                    const bookElement = document.createElement('div');
+                    bookElement.classList.add('book');
+
+                    // Get book title and author name
+                    const title = book.volumeInfo.title;
+                    const author = book.volumeInfo.authors ? book.volumeInfo.authors.join(', ') : 'Unknown author';
+
+                    // Get book cover image
+                    const cover = book.volumeInfo.imageLinks ? book.volumeInfo.imageLinks.thumbnail : 'https://via.placeholder.com/150x200?text=No+Cover+Image';
+
+                    // Get book description
+                    const description = book.volumeInfo.description ? book.volumeInfo.description.substring(0, 200) + '...' : 'No description available.';
+
+                    // Create book element
+                    bookElement.innerHTML = `
+                        <img src="${cover}" alt="${title} cover">
+                        <h2>${title}</h2>
+                        <p>By ${author}</p>
+                        <p>${description}</p>
+                    `;
+
+                    // Append book element to results container
+                    bookResults.appendChild(bookElement);
+                });
+            })
+            .catch(error => console.error(error));
+    </script>
+</body>
+</html>
